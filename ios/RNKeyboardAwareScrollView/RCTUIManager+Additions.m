@@ -2,6 +2,12 @@
 #import <UIKit/UIKit.h>
 
 const CGFloat RNTDetectCaretPositionTrialCount = 20;
+NSString * const RCTUIManagerCaretErrorDomain = @"RCTUIManagerCaretErrorDomain";
+
+typedef enum : NSUInteger {
+    RCTUIManagerCaretRectFailNotDetected = 1001,
+    RCTUIManagerCaretRectFailEndOfText
+} RCTUIManagerCaretRectFail;
 
 @implementation RCTUIManager (Additions)
 
@@ -20,8 +26,15 @@ RCT_EXPORT_METHOD(measureSelectionInWindow:(nonnull NSNumber *)reactTag callback
             if ( endPosition ) {
                 [self rnt_caretRectIn:textInput trialCount:RNTDetectCaretPositionTrialCount completion:^(NSError *error, CGRect selectionEndRect) {
                     if (error) {
-                        RCTLogWarn(@"measureSelectionInWindow cannot find the caret position in view with tag #%@", reactTag);
-                        callback(@[@"Caret position could not be determined"]);
+                        switch (error.code) {
+                            case RCTUIManagerCaretRectFailNotDetected:
+                                RCTLogWarn(@"measureSelectionInWindow cannot find the caret rect in view with tag #%@", reactTag);
+                                callback(@[@"Caret rect could not be determined"]);
+                                break;
+                            case RCTUIManagerCaretRectFailEndOfText:
+                                callback(@[@"Caret rect could not be determined but detected that it is at the end of the text"]);
+                                break;
+                        }
                         return;
                     }
                     CGRect windowFrame = [newResponder.window convertRect:newResponder.frame fromView:newResponder.superview];
@@ -67,7 +80,20 @@ RCT_EXPORT_METHOD(measureSelectionInWindow:(nonnull NSNumber *)reactTag callback
 - (void)rnt_caretRectIn:(id<UITextInput>)textInput trialCount:(NSInteger)trialCount completion:(void (^)(NSError *error, CGRect rect))completion {
     if ( trialCount == 0 ) {
         //We tried but couldn't find, return an error
-        completion([NSError new], CGRectZero);
+        completion([[NSError alloc] initWithDomain:RCTUIManagerCaretErrorDomain
+                                              code:RCTUIManagerCaretRectFailNotDetected
+                                          userInfo:nil],
+                   CGRectZero);
+        return;
+    }
+    NSComparisonResult result = [textInput comparePosition:textInput.endOfDocument toPosition:textInput.selectedTextRange.end];
+    if( result == NSOrderedSame ) {
+        //caretRectForPosition can't detect the rect when caret is at the end of the text
+        //so we aren't going to try that and lose time here
+        completion([[NSError alloc] initWithDomain:RCTUIManagerCaretErrorDomain
+                                              code:RCTUIManagerCaretRectFailEndOfText
+                                          userInfo:nil],
+                   CGRectZero);
         return;
     }
     UITextPosition *endPosition = textInput.selectedTextRange.end;
