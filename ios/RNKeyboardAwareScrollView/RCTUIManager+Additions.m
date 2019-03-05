@@ -13,6 +13,7 @@ typedef enum : NSUInteger {
 
 RCT_EXPORT_METHOD(measureSelectionInWindow:(nonnull NSNumber *)reactTag callback:(RCTResponseSenderBlock)callback)
 {
+    __weak typeof(self) weakSelf = self;
     [self addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
         UIView *newResponder = [uiManager viewForReactTag:reactTag];
         if ( !newResponder ) {
@@ -24,7 +25,7 @@ RCT_EXPORT_METHOD(measureSelectionInWindow:(nonnull NSNumber *)reactTag callback
             id<UITextInput> textInput = (id<UITextInput>)newResponder;
             UITextPosition *endPosition = textInput.selectedTextRange.end;
             if ( endPosition ) {
-                [self rnt_caretRectIn:textInput trialCount:RNTDetectCaretPositionTrialCount completion:^(NSError *error, CGRect selectionEndRect) {
+                [weakSelf rnt_caretRectIn:textInput trialCount:RNTDetectCaretPositionTrialCount completion:^(NSError *error, CGRect selectionEndRect) {
                     if (error) {
                         switch (error.code) {
                             case RCTUIManagerCaretRectFailNotDetected:
@@ -38,7 +39,7 @@ RCT_EXPORT_METHOD(measureSelectionInWindow:(nonnull NSNumber *)reactTag callback
                         return;
                     }
                     CGRect windowFrame = [newResponder.window convertRect:newResponder.frame fromView:newResponder.superview];
-                    CGFloat textViewHeight = [self rnt_contentHeightIn:textInput defaultHeight:windowFrame.size.height];
+                    CGFloat textViewHeight = [weakSelf rnt_contentHeightIn:textInput defaultHeight:windowFrame.size.height];
                     CGFloat textInputBottomTextInset = 0;
                     if ( [textInput isKindOfClass:[UITextView class]] ) {
                         textInputBottomTextInset = ((UITextView *)textInput).textContainerInset.bottom;
