@@ -1,6 +1,5 @@
 
 #import "RNTKeyboardAwareScrollView.h"
-#import <React/RCTUIManager.h>
 
 const CGFloat RNTDetectCaretPositionTrialCount = 20;
 NSString * const RCTUIManagerCaretErrorDomain = @"RCTUIManagerCaretErrorDomain";
