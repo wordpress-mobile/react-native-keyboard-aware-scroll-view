@@ -1,8 +1,8 @@
 
-#if __has_include("RCTViewManager.h")
-#import "RCTViewManager.h"
+#if __has_include("RCTUIManager.h")
+#import "RCTUIManager.h"
 #else
-#import <React/RCTViewManager.h>
+#import <React/RCTUIManager.h>
 #endif
 
 @interface RNTKeyboardAwareScrollView : RCTViewManager
