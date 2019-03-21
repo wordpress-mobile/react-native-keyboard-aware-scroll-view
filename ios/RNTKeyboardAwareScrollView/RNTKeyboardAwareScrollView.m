@@ -17,7 +17,7 @@ RCT_EXPORT_MODULE()
     return YES;
 }
 
-RCT_EXPORT_METHOD(viewInSameViewController:(nonnull NSNumber *)reactTag
+RCT_EXPORT_METHOD(viewIsDescendantOf:(nonnull NSNumber *)reactTag
                   ancestor:(nonnull NSNumber *)ancestorReactTag
                   callback:(RCTResponseSenderBlock)callback) {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
@@ -27,13 +27,8 @@ RCT_EXPORT_METHOD(viewInSameViewController:(nonnull NSNumber *)reactTag
             callback(@[@"Couldn't find views"]);
             return;
         }
-        UIViewController *viewControllerInputView = inputView.reactViewController;
-        UIViewController *viewControllerAncestorView = ancestorView.reactViewController;
-        if ( viewControllerInputView != viewControllerAncestorView ){
-            callback(@[[NSNull null], @(NO)]);
-            return;
-        }
-        callback(@[[NSNull null], @(YES)]);
+        BOOL result = [inputView isDescendantOfView:ancestorView];
+        callback(@[[NSNull null], @(result)]);
     }];
 }
 
