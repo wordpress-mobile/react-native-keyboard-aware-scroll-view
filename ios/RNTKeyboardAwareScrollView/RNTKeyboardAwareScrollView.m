@@ -1,5 +1,5 @@
-#import "RCTUIManager+Additions.h"
-#import <UIKit/UIKit.h>
+
+#import "RNTKeyboardAwareScrollView.h"
 
 const CGFloat RNTDetectCaretPositionTrialCount = 20;
 NSString * const RCTUIManagerCaretErrorDomain = @"RCTUIManagerCaretErrorDomain";
@@ -9,12 +9,18 @@ typedef enum : NSUInteger {
     RCTUIManagerCaretRectFailEndOfText
 } RCTUIManagerCaretRectFail;
 
-@implementation RCTUIManager (Additions)
+@implementation RNTKeyboardAwareScrollView
+
+RCT_EXPORT_MODULE()
+
++ (BOOL)requiresMainQueueSetup {
+    return YES;
+}
 
 RCT_EXPORT_METHOD(measureSelectionInWindow:(nonnull NSNumber *)reactTag callback:(RCTResponseSenderBlock)callback)
 {
     __weak typeof(self) weakSelf = self;
-    [self addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
         UIView *newResponder = [uiManager viewForReactTag:reactTag];
         if ( !newResponder ) {
             RCTLogWarn(@"measureSelectionInWindow cannot find view with tag #%@", reactTag);
