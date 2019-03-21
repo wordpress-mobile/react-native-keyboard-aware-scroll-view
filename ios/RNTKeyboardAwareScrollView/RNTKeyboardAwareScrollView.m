@@ -23,7 +23,7 @@ RCT_EXPORT_METHOD(viewIsDescendantOf:(nonnull NSNumber *)reactTag
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
         UIView *inputView = [uiManager viewForReactTag:reactTag];
         UIView *ancestorView = [uiManager viewForReactTag:ancestorReactTag];
-        if ( !inputView || !ancestorView) {
+        if (!inputView || !ancestorView) {
             callback(@[@"Couldn't find views"]);
             return;
         }
