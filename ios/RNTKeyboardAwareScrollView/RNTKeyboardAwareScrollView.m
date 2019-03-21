@@ -17,6 +17,21 @@ RCT_EXPORT_MODULE()
     return YES;
 }
 
+RCT_EXPORT_METHOD(viewIsDescendantOf:(nonnull NSNumber *)reactTag
+                  ancestor:(nonnull NSNumber *)ancestorReactTag
+                  callback:(RCTResponseSenderBlock)callback) {
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+        UIView *inputView = [uiManager viewForReactTag:reactTag];
+        UIView *ancestorView = [uiManager viewForReactTag:ancestorReactTag];
+        if (!inputView || !ancestorView) {
+            callback(@[@"Couldn't find views"]);
+            return;
+        }
+        BOOL result = [inputView isDescendantOfView:ancestorView];
+        callback(@[[NSNull null], @(result)]);
+    }];
+}
+
 RCT_EXPORT_METHOD(measureSelectionInWindow:(nonnull NSNumber *)reactTag callback:(RCTResponseSenderBlock)callback)
 {
     __weak typeof(self) weakSelf = self;
