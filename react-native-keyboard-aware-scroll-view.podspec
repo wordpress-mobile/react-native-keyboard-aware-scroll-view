@@ -14,5 +14,5 @@ Pod::Spec.new do |s|
   s.source_files    = "ios/RNTKeyboardAwareScrollView/*.{h,m}"
   s.preserve_paths  = "**/*.js"
 
-  s.dependency 'React'
+  s.dependency 'React-Core'
 end
